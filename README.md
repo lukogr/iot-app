@@ -17,10 +17,14 @@ Application uses some extensions of the OpenFlow 1.3 protocol implemented by Nov
 - adding metadata to the UDP packet
   - 25 bytes are added to UDP with information useful for parser (sensor type and thingspeak API key)   
 
+Cloud orchestrator should be run first before iot application. 
+
 **To run cloud orchestrator:**
+  1. Run python script
 ```
 # iot_fwd.py
 ```
+Iot_fwd provides Rest API for container management (lxc launch, exec, delete).
    
 **To run iot_app:**
   1. Install required Python packages:
