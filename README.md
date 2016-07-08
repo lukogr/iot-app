@@ -9,9 +9,10 @@ IoT application based on the configuration file can manage network and clould re
 
 Application uses some extensions of the OpenFlow 1.3 protocol implemented by NoviFlow like:
 - matching to UDP payload: first 10 bytes of the text protocol sending inside UDP is ID of the sensor. Based on the ID application:
-  - automaticly create LXC container in the cloud using cloud orchestrator
-  - run thingspeak service inside LXC dedicated for owner of the "thing" using cloud orchestrator
-  - create IoTparser instance using cloud orchestrator (parser analyse UDP packet and using thingspeak API put data into service)
+  - using cloud orchestrator:
+    - automaticly create LXC container in the cloud 
+    - run thingspeak service inside LXC container dedicated for owner of the "thing" 
+    - create IoTparser instance (parser get data from UDP packet and uses thingspeak API to put these data into service)
   - setup path in SDN network using OpenFlow 1.3 protocol
 - adding metadata to the UDP packet
   - 25 bytes are added to UDP with information useful for parser (sensor type and thingspeak API key)   
