@@ -5,17 +5,17 @@ Two software modules are included:
   1. iot application 
   2. cloud orchestrator
 
-IoT application based on the configuration file can manage network and clould resources for dynamicly seting up channels from "things" to the cloud through the SDN infrastructure. 
+IoT application based on the configuration file can manage network and clould resources to dynamicly create channels from "things" to the cloud through the SDN infrastructure. 
 
 Application uses some extensions of the OpenFlow 1.3 protocol implemented by NoviFlow like:
 - matching to UDP payload: first 10 bytes of the text protocol sending inside UDP is ID of the sensor. Based on the ID application:
   - using cloud orchestrator:
     - automaticly create LXC container in the cloud 
-    - run thingspeak service inside LXC container dedicated for owner of the "thing" 
-    - create IoTparser instance (parser get data from UDP packet and uses thingspeak API to put these data into service)
-  - setup path in SDN network using OpenFlow 1.3 protocol
+    - run thingspeak service inside LXC container (service is dedicated for owner of the "thing") 
+    - create IoT parser instance (parser gets data from UDP packet and uses thingspeak API to put these data into service)
+  - set up path in SDN network using OpenFlow 1.3 protocol
 - adding metadata to the UDP packet
-  - 25 bytes are added to UDP with information useful for parser (sensor type and thingspeak API key)   
+  - extra 25 bytes are added to UDP with information useful for parser (sensor type, UDP port number and thingspeak API key)   
 
 Cloud orchestrator should be run first before iot application. 
 
@@ -24,7 +24,7 @@ Cloud orchestrator should be run first before iot application.
 ```
 # iot_fwd.py
 ```
-Iot_fwd provides Rest API for container management (lxc launch, exec, delete).
+Iot_fwd provides Rest API for management of the container (lxc launch, exec, delete).
    
 **To run iot_app:**
   1. Install required Python packages:
