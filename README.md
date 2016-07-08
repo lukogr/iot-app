@@ -39,4 +39,20 @@ Iot_fwd provides Rest API for management of the container (lxc launch, exec, del
   $ ryu-manager novi_rest_iot_app.py
   ```
 
+TNC16 - live demonstration
+===
 This software modules were used during demonstration "IoT ecosystem over programmable SDN infrastructure for Smart City applications" at the TNC16 conference in Prague (12-16.06.2016) prepared together with NoviFlow and Spirent companies.
+
+Current status of the network, cloud, containers and services can me monitored using web brobser (Firefox is recommended).
+  1. General information (json format)
+    ```
+    http://{iot_app_IPaddress}
+    ```
+  2. Data center monitoring tools:
+    ```
+    http://{iot_app_IPaddress}:5000/static/iot-dc/ui/index.html
+    ```    
+  3. Demonstration architecture:
+    ```
+    http://{iot_app_IPaddress}:5000/tnc16
+    ```
