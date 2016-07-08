@@ -1,0 +1,61 @@
+<head>
+    <title>TNC16</title>
+    <meta charset="utf-8">
+</head>    
+
+<script type=text/javascript src="{{
+  url_for('static', filename='jquery.js') }}"></script>
+  
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
+<script type=text/javascript>
+
+    var refresh_interval=1000;
+     
+
+    // ---
+    setInterval (function(){ $.getJSON($SCRIPT_ROOT + '/get_app_status',{}, function(data){
+
+    	response = data.status
+
+        //$("#all").html(JSON.stringify(data.all, null, '\t'));
+        $("#app").html(JSON.stringify(response, null, '\t'));
+		
+       
+
+    });},refresh_interval);  
+    
+    $(document).ready(function(){
+        //buttons: 
+        $("#rungen").click( function(){console.log("Strarting UDP traffic gen");
+            $.get("run_gen", function(data){console.log(data.status);});
+        });
+
+        $("#stopgen").click( function(){console.log("Stopping UDP traffic gen" );
+            $.get("stop_gen", function(data){console.log(data.status);});
+        });
+    });
+    
+
+
+</script>
+
+
+
+<h1>TNC16 demonstration - PSNC & NoviFlow</h1>
+<h2>"IoT ecosystem over programmable SDN infrastructure for Smart City applications"</h2>
+
+<body>
+
+<pre id="app"></pre><br>
+<pre id="all"></pre><br>
+
+<hr>
+
+    <button id="rungen">Start generator</button>
+    <button id="stopgen">Stop generator</button><br>
+
+
+</body>
