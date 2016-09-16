@@ -43,6 +43,8 @@ TNC16 - live demonstration
 ===
 This software modules were used during demonstration "IoT ecosystem over programmable SDN infrastructure for Smart City applications" at the TNC16 conference in Prague (12-16.06.2016) prepared together with NoviFlow and Spirent companies.
 
+![alt tag](https://github.com/lukogr/iot-app/blob/master/arch/iot_app_demo_arch.png)
+
 Current status of the network, cloud, containers and services can me monitored using web browser (Firefox is recommended).
   1. General information (json format)
     ```
