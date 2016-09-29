@@ -5,6 +5,9 @@ IoT/SDN network application resolve problem of IoT traffic management in a Smart
 
 The iot-app is sollution for the automated initiation and provisioning of end-to-end communication channels through the SDN-based metro network infrastructure from “internet things” to dedicated services deployed in the cloud via containers for data storage, visualization and analysis.
 
+**This iot-app is just proof-of-concept but it works now!**
+![alt tag](https://github.com/lukogr/iot-app/blob/master/arch/iot_app_features.png)
+
 Recipients of the solution are administrators of inteligent spaces (Smart City, Smart Building) equipped with multiple IoT devices, who would like to optimize IoT traffic management by the orchestration of common network and containerized cloud resources.
 
 The biggest advantages of IoT application:
@@ -52,12 +55,9 @@ Note: "thingspeak" image for LXC should be deployed first in the cloud.
   $ ryu-manager novi_rest_iot_app.py
   ```
 
-This iot-app is just proof-of-concept but it works now!
-![alt tag](https://github.com/lukogr/iot-app/blob/master/arch/iot_app_features.png)
-
-Live demonstration
+"IoT ecosystem over programmable SDN infrastructure for Smart City applications" - live demonstration
 ===
-This software modules allow to prepare live demonstration "IoT ecosystem over programmable SDN infrastructure for Smart City applications". 
+This software modules allow to prepare live demonstration. 
 
 Goals of the demonstration:
 - to present a network application enabling dynamic creation of the end-to-end communication channel from “things” to the cloud over SDN infrastructure
@@ -70,12 +70,13 @@ Demonstration was first presented at the TNC16 conference in Prague (12-16.06.20
 
 ![alt tag](https://github.com/lukogr/iot-app/blob/master/arch/iot_app_demo_arch.png)
 
-List of equipment:
+**List of equipment:**
 - Libelium Meshlium IoT system with two sets of sensors: Wasp Mote SmartCity and Ambient, 
 - Three NoviFlow NoviSwitch 2128 OpenFlow switches, 
 - Spirent TestCenter (STC) N4U with 4x10G card, 
 - HP ProLiant DL380 Gen 9 server with KVM and VMs for i) Ryu OpenFlow Controller, ii) IoT Application, iii) LXC containers. 
 
+**Monitoring tools**
 Current status of the network, cloud, containers and services can me monitored using web browser (Firefox is recommended).
   1. General information (json format)
     ```
