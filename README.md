@@ -36,6 +36,8 @@ Cloud orchestrator should be run first before iot application.
 # iot_fwd.py
 ```
 Iot_fwd provides Rest API for management of the container (lxc launch, exec, delete).
+
+Note: "thingspeak" image for LXC should be deployed first in the cloud.
    
 **To run iot_app:**
   1. Install required Python packages:
@@ -50,13 +52,29 @@ Iot_fwd provides Rest API for management of the container (lxc launch, exec, del
   $ ryu-manager novi_rest_iot_app.py
   ```
 
+This iot-app is just proof-of-concept but it works now!
+![alt tag](https://github.com/lukogr/iot-app/blob/master/arch/iot_app_features.png)
+
 Live demonstration
 ===
 This software modules allow to prepare live demonstration "IoT ecosystem over programmable SDN infrastructure for Smart City applications". 
 
+Goals of the demonstration:
+- to present a network application enabling dynamic creation of the end-to-end communication channel from “things” to the cloud over SDN infrastructure
+- to show extensions provided by NoviFlow using the standard OpenFlow experimenter capabilities: 
+  - Matching on specific bytes in the UDP Payload
+  - Setting the value of specific bytes in the UDP Payload for traffic from IoT Gateway to OpenFlow 1.3 switch
+- to show how Spirent TestCenter (STC) can be used to generate multi device IoT test traffic
+
 Demonstration was first presented at the TNC16 conference in Prague (12-16.06.2016) together with NoviFlow and Spirent companies.
 
 ![alt tag](https://github.com/lukogr/iot-app/blob/master/arch/iot_app_demo_arch.png)
+
+List of equipment:
+- Libelium Meshlium IoT system with two sets of sensors: Wasp Mote SmartCity and Ambient, 
+- Three NoviFlow NoviSwitch 2128 OpenFlow switches, 
+- Spirent TestCenter (STC) N4U with 4x10G card, 
+- HP ProLiant DL380 Gen 9 server with KVM and VMs for i) Ryu OpenFlow Controller, ii) IoT Application, iii) LXC containers. 
 
 Current status of the network, cloud, containers and services can me monitored using web browser (Firefox is recommended).
   1. General information (json format)
