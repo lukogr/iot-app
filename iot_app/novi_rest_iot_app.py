@@ -43,7 +43,7 @@ from ryu.lib.packet import ethernet
 from ryu.lib.packet import udp
 
 #app:
-from iot_app_conf import TNC16_demo_config, channel_type_short
+from iot_app_conf import demo_config, channel_type_short
 import requests, json, re, time, logging.config, threading
 from cherrypy import wsgiserver
 from flask import Flask,jsonify, render_template, request, make_response, current_app, redirect
@@ -127,7 +127,7 @@ flask_app.start()
 #---------------------------------------------------------#
 
 LOG = logging.getLogger(__name__)
-log_filename = 'tnc16.log'
+log_filename = 'demo.log'
 formatter = logging.Formatter('%(asctime)s - %(name)s %(levelname)s - %(message)s')
 rh = logging.handlers.RotatingFileHandler(log_filename, maxBytes=200000, backupCount=3)    
 rh.setFormatter(formatter) 
@@ -140,6 +140,10 @@ def root_():
 def tnc16():     
     return render_template('tnc16.html')
 
+@app.route("/control_panel")
+def control_panel():     
+    return render_template('control_panel.html')
+
 @app.route("/ui")
 def ui():     
     return render_template('iot-dc/ui/index.html')
@@ -147,29 +151,29 @@ def ui():
 @app.route("/get_app_status")
 def get_app_status():        
     app_status={}
-    for u in TNC16_demo_config["users"]:
+    for u in demo_config["users"]:
         app_status[u] = {}
-        app_status[u]["account_created"] = TNC16_demo_config["users"][u]["account_created"]
-        app_status[u]["lxc_created"] = TNC16_demo_config["users"][u]["lxc_created"]
-        app_status[u]["parser_created"] = TNC16_demo_config["users"][u]["udp_socket_created"]
+        app_status[u]["account_created"] = demo_config["users"][u]["account_created"]
+        app_status[u]["lxc_created"] = demo_config["users"][u]["lxc_created"]
+        app_status[u]["parser_created"] = demo_config["users"][u]["udp_socket_created"]
         app_status[u]["iot"] = {}
 
-        if TNC16_demo_config["users"][u]["account_created"]:
-            soc=TNC16_demo_config["users"][u]["service_IP"]+":"+str(TNC16_demo_config["users"][u]["service_port"])
+        if demo_config["users"][u]["account_created"]:
+            soc=demo_config["users"][u]["service_IP"]+":"+str(demo_config["users"][u]["service_port"])
             app_status[u]["thingspeak_service_ip"] = "http://"+soc
 
         else:
             app_status[u]["thingspeak_service_ip"] = None
 
-        for ch in TNC16_demo_config["channels"]:
-            if TNC16_demo_config["channels"][ch]["user"]==u:
+        for ch in demo_config["channels"]:
+            if demo_config["channels"][ch]["user"]==u:
                 app_status[u]["iot"][ch]={}
-                app_status[u]["iot"][ch]["channel_created"] = TNC16_demo_config["channels"][ch]["channel_created"]
-                app_status[u]["iot"][ch]["path_established"] = TNC16_demo_config["channels"][ch]["path_established"]               
+                app_status[u]["iot"][ch]["channel_created"] = demo_config["channels"][ch]["channel_created"]
+                app_status[u]["iot"][ch]["path_established"] = demo_config["channels"][ch]["path_established"]               
 
 
     return jsonify(status=app_status)
-    #return jsonify(status=TNC16_demo_config)
+    #return jsonify(status=demo_config)
 
 @app.route("/run_gen")
 @crossdomain(origin='*')
@@ -539,7 +543,7 @@ class NoviRestStatsApi(ofctl_rest.RestStatsApi):
 
         ev.msg.datapath.send_msg(ev.msg.datapath.ofproto_parser.OFPDescStatsRequest(ev.msg.datapath, 0))
 
-        # for TNC16:
+        # for demo:
         iot_app.configureNoviForDemo(ev)
 
 
@@ -627,9 +631,9 @@ class IoTApp(threading.Thread):
         parser = datapath.ofproto_parser
         dpid = datapath.id
 
-        if dpid in TNC16_demo_config["NoviSwitches"]:
+        if dpid in demo_config["NoviSwitches"]:
 
-            self.logger.info("Configuring %s (dpid: %s) for the demo TNC16"%(TNC16_demo_config["NoviSwitches"][dpid], dpid))
+            self.logger.info("Configuring %s (dpid: %s) for the demo "%(demo_config["NoviSwitches"][dpid], dpid))
             time.sleep(3)
             self.logger.info("wait a while..")
             ryu_uri ="http://0.0.0.0:8080"
@@ -645,9 +649,9 @@ class IoTApp(threading.Thread):
             requests.post(ryu_uri+(uri.UDP_PAYLOAD_CONFIG), data=json.dumps(udp_config)).text
             
             self.logger.info("Adding OFPP_CONTROLLER flow modes [for packet_in])")        
-            for path in TNC16_demo_config["network_maps"]: 
-                if dpid in TNC16_demo_config["network_maps"][path]:     
-                    for pair in TNC16_demo_config["network_maps"][path][dpid]["flows"]:
+            for path in demo_config["network_maps"]: 
+                if dpid in demo_config["network_maps"][path]:     
+                    for pair in demo_config["network_maps"][path][dpid]["flows"]:
                         ports = [pair["in_port"], pair["out_port"]]
 
                         for port in ports:
@@ -787,7 +791,7 @@ class IoTApp(threading.Thread):
                 "name": "Smart City channel",
                 "api_key":ak,
                 "public_flag":"true",
-                "description":"TNC16 demonstration",
+                "description":"Live demonstration",
                 "field1":"bat",
                 "field2":"temperature",
                 "field3":"noise",
@@ -799,7 +803,7 @@ class IoTApp(threading.Thread):
                 "name": "Ambient channel",
                 "api_key":ak,
                 "public_flag":"true",
-                "description":"TNC16 demonstration",
+                "description":"Live demonstration",
                 "field1":"bat",
                 "field2":"humidity",
                 "field3":"luminocity",
@@ -810,7 +814,7 @@ class IoTApp(threading.Thread):
                 "name": "Test channel",
                 "api_key":ak,
                 "public_flag":"true",
-                "description":"TNC16 demonstration",
+                "description":"Live demonstration",
                 "field1":"random"
             }        
         if type=="SpirentChannel":
@@ -818,7 +822,7 @@ class IoTApp(threading.Thread):
                 "name": "Spirent channel",
                 "api_key":ak,
                 "public_flag":"true",
-                "description":"TNC16 demonstration",
+                "description":"Live demonstration",
                 "field1":"random"
             }        
         header = {'content-type': 'application/json'}
@@ -832,9 +836,15 @@ class IoTApp(threading.Thread):
             if type=="TestChannel" or type=="SpirentChannel":
                 payload_up = {
                     "api_key":ak,
+                    
                     #Prague, Venue
-                    "latitude" :"50.109569",
-                    "longitude":"14.501408",
+                    #"latitude" :"50.109569",
+                    #"longitude":"14.501408",
+                    
+                    #cbpio , 
+                    "latitude" :"52.406986",
+                    "longitude":"16.953339",
+                    
                     "elevation":"0"
                 }        
           
@@ -861,10 +871,10 @@ class IoTApp(threading.Thread):
         parser = datapath.ofproto_parser
         in_port = msg.match['in_port']        
 
-        ak_write = TNC16_demo_config["channels"][wasp_mote_ID]["ak"]
-        user_name =  TNC16_demo_config["channels"][wasp_mote_ID]["user"]
-        service_port = TNC16_demo_config["users"][user_name]["service_port"]
-        channel_type =  TNC16_demo_config["channels"][wasp_mote_ID]["type"]
+        ak_write = demo_config["channels"][wasp_mote_ID]["ak"]
+        user_name =  demo_config["channels"][wasp_mote_ID]["user"]
+        service_port = demo_config["users"][user_name]["service_port"]
+        channel_type =  demo_config["channels"][wasp_mote_ID]["type"]
 
         if ak_write != None:
             ins_udp_payload = "#"+channel_type_short[channel_type]+"#" + ak_write + "#"+str(service_port)                                                                 
@@ -927,22 +937,22 @@ class IoTApp(threading.Thread):
                     wasp_mote_ID = pkt[3][26:35]
                     
                     #check id wasp_mote_ID is supported
-                    if wasp_mote_ID in TNC16_demo_config["channels"]:
+                    if wasp_mote_ID in demo_config["channels"]:
 
                         self.logger.info("%s"%(pkt))
                                                 
                         # wasp_mote -> user_name
-                        user_name =  TNC16_demo_config["channels"][wasp_mote_ID]["user"]
+                        user_name =  demo_config["channels"][wasp_mote_ID]["user"]
                         self.logger.info("^^^ Received new UDP traffic from wasp_mote_ID: %s (Traffic of user: %s)"%(wasp_mote_ID, user_name))
                         
-                        service_port = TNC16_demo_config["users"][user_name]["service_port"]
-                        channel_type =  TNC16_demo_config["channels"][wasp_mote_ID]["type"]
+                        service_port = demo_config["users"][user_name]["service_port"]
+                        channel_type =  demo_config["channels"][wasp_mote_ID]["type"]
                         
                         #where to send the packet
                         out_port=None
-                        path = TNC16_demo_config["users"][user_name]["map"]                    
-                        if dpid in TNC16_demo_config["network_maps"][path]:
-                            for pair in TNC16_demo_config["network_maps"][path][dpid]["flows"]:
+                        path = demo_config["users"][user_name]["map"]                    
+                        if dpid in demo_config["network_maps"][path]:
+                            for pair in demo_config["network_maps"][path][dpid]["flows"]:
                                 if pair["in_port"]==in_port:
                                     out_port = pair["out_port"]
                                     break
@@ -950,7 +960,7 @@ class IoTApp(threading.Thread):
 
                         if out_port != None:
                         
-                            if (wasp_mote_ID in self.channels_created) and (TNC16_demo_config["channels"][wasp_mote_ID]["path_established"]):
+                            if (wasp_mote_ID in self.channels_created) and (demo_config["channels"][wasp_mote_ID]["path_established"]):
 
                                 #just send packet_out (for enqued packets)
                                 self.sendPacketOutUDP(msg, out_port, wasp_mote_ID)
@@ -959,8 +969,8 @@ class IoTApp(threading.Thread):
                                 
                             else:
                                 #--------------------------------------------------------------------------------                               
-                                service_IP = TNC16_demo_config["users"][user_name]["service_IP"]                
-                                if not TNC16_demo_config["users"][user_name]['account_created']: 
+                                service_IP = demo_config["users"][user_name]["service_IP"]                
+                                if not demo_config["users"][user_name]['account_created']: 
                                     
 
                                     # 1. create container for the user
@@ -979,7 +989,7 @@ class IoTApp(threading.Thread):
                                             self.logger.info("%s"%response_j)
                                             if response_j["status"] == "Running":
 
-                                                TNC16_demo_config["users"][user_name]["lxc_created"] = True
+                                                demo_config["users"][user_name]["lxc_created"] = True
                                                 container_ip = response_j["ip"]
 
                                                 #run_script to launch thingspeak
@@ -1002,9 +1012,9 @@ class IoTApp(threading.Thread):
 
 
                                     # ----
-                                    user_mail = TNC16_demo_config["users"][user_name]["mail"]
-                                    user_pass = TNC16_demo_config["users"][user_name]["password"]
-                                    time_zone = TNC16_demo_config["users"][user_name]["time_zone"]    
+                                    user_mail = demo_config["users"][user_name]["mail"]
+                                    user_pass = demo_config["users"][user_name]["password"]
+                                    time_zone = demo_config["users"][user_name]["time_zone"]    
                                     
                                     #---del user account (if any old exist in thingspeak):
                                     self.logger.info("Delate account: %s (if any old exist)"%(user_name))
@@ -1015,9 +1025,9 @@ class IoTApp(threading.Thread):
                                     signUpUser_response = self.signUpUser(service_IP, service_port, user_name, user_mail, user_pass, time_zone)                      
 
                                     if signUpUser_response != 0:
-                                        TNC16_demo_config["users"][user_name]['account_created'] = True
-                                        TNC16_demo_config["users"][user_name]["APIkey"] = signUpUser_response["ak"]
-                                        TNC16_demo_config["users"][user_name]["ID"] = signUpUser_response["id"]
+                                        demo_config["users"][user_name]['account_created'] = True
+                                        demo_config["users"][user_name]["APIkey"] = signUpUser_response["ak"]
+                                        demo_config["users"][user_name]["ID"] = signUpUser_response["id"]
 
                                         self.logger.info("Account for user %s created: %s"%(user_name, signUpUser_response))
                                     else:                            
@@ -1028,16 +1038,16 @@ class IoTApp(threading.Thread):
 
 
                                 #---create thingspeak channel---
-                                if not TNC16_demo_config["channels"][wasp_mote_ID]["channel_created"]:
+                                if not demo_config["channels"][wasp_mote_ID]["channel_created"]:
                                     self.logger.info("Creating thingspeak channel for wasp_mote: %s"%(wasp_mote_ID))                       
-                                    ak = TNC16_demo_config["users"][user_name]["APIkey"]
+                                    ak = demo_config["users"][user_name]["APIkey"]
                                     response_create_channel = self.createThingSpeakChannel(service_IP, service_port, channel_type,ak)
                                    
                                     if response_create_channel != 0:
                                         if  response_create_channel.status_code == 200:
-                                            TNC16_demo_config["channels"][wasp_mote_ID]["channel_created"] = True     
+                                            demo_config["channels"][wasp_mote_ID]["channel_created"] = True     
                                             response_create_channel_j = response_create_channel.json()
-                                            TNC16_demo_config["channels"][wasp_mote_ID]["ak"] = response_create_channel_j["api_keys"][0]["api_key"]
+                                            demo_config["channels"][wasp_mote_ID]["ak"] = response_create_channel_j["api_keys"][0]["api_key"]
 
                                             self.logger.info("Channel for wasp_mote: %s created;"%(wasp_mote_ID))
 
@@ -1052,15 +1062,15 @@ class IoTApp(threading.Thread):
                                 #----------------------------
 
              
-                                iot_server_IP = TNC16_demo_config["users"][user_name]["iot_server_IP"]
-                                iot_server_port = TNC16_demo_config["users"][user_name]["iot_server_port"] 
+                                iot_server_IP = demo_config["users"][user_name]["iot_server_IP"]
+                                iot_server_port = demo_config["users"][user_name]["iot_server_port"] 
                                 
                                 #--- if channels created open UDP sockets and configure OF network
                                 # also send packet_out
-                                if (TNC16_demo_config["users"][user_name]['account_created']
-                                    and TNC16_demo_config["channels"][wasp_mote_ID]["channel_created"]):
+                                if (demo_config["users"][user_name]['account_created']
+                                    and demo_config["channels"][wasp_mote_ID]["channel_created"]):
                                     
-                                    if not TNC16_demo_config["users"][user_name]["udp_socket_created"]:
+                                    if not demo_config["users"][user_name]["udp_socket_created"]:
                                         #--- open UDP socket on iot_server (iot_fwd)
                                         self.logger.info("Opening UDP socket on iot_server")
                                         try:        
@@ -1070,27 +1080,27 @@ class IoTApp(threading.Thread):
                                             r_json = response.json()
                                             self.logger.info("Open UDP socket response: %s"%(r_json["status"]))
                                             if r_json["status"] == "ok":
-                                                TNC16_demo_config["users"][user_name]["udp_socket_created"] = True
+                                                demo_config["users"][user_name]["udp_socket_created"] = True
 
                                         except:
                                             self.logger.error("Some problem during socket opening!")
 
 
-                                    if not TNC16_demo_config["channels"][wasp_mote_ID]["path_established"]:
+                                    if not demo_config["channels"][wasp_mote_ID]["path_established"]:
                                         #--- create path in SDN network and send packet_out:
 
                                         # Install flow_mod into all OF SWs once:
                                                           
-                                        for dpid in TNC16_demo_config["network_maps"][path]:
+                                        for dpid in demo_config["network_maps"][path]:
                                         
                                             self.logger.info("Adding flow_mods to use match and set UDP and IP payload (dpid: %s)"%(dpid))
-                                            ak_write = TNC16_demo_config["channels"][wasp_mote_ID]["ak"]
+                                            ak_write = demo_config["channels"][wasp_mote_ID]["ak"]
                                             if ak_write!=None:
                                                 
                                                 ins_udp_payload = "#"+channel_type_short[channel_type]+"#" + ak_write + "#"+str(service_port)
 
 
-                                                out_port_action = TNC16_demo_config["network_maps"][path][dpid]["flows"][0]["out_port"]
+                                                out_port_action = demo_config["network_maps"][path][dpid]["flows"][0]["out_port"]
 
                                                 # Flow Mod matching on UDP payload 
                                                 fm = {'dpid': dpid, 'command': 'add', 'table_id': 0,  'priority': 200,
@@ -1098,7 +1108,7 @@ class IoTApp(threading.Thread):
                                                        'instructions': [{'type': 'apply',
                                                                         'actions': [  
                                                                             {'type': 'set_field', 'field': 'udp_dst', 'value': iot_server_port},
-                                                                            {'type': 'set_field', 'field': 'ipv4_src', 'value': TNC16_demo_config["users"][user_name]["src_ip"]},
+                                                                            {'type': 'set_field', 'field': 'ipv4_src', 'value': demo_config["users"][user_name]["src_ip"]},
                                                                             {'type': 'set_field', 'field': 'ipv4_dst', 'value': iot_server_IP},
                                                                             {'type': 'experimenter', 'exp_type': 'set_udp_payload', 'offset': 0, 'value': ins_udp_payload},
                                                                             {'type': 'output', 'port': out_port_action}]}]}
@@ -1110,7 +1120,7 @@ class IoTApp(threading.Thread):
                                             else:
                                                 self.logger.warning("AK is not known for %s!"%(wasp_mote_ID))  
 
-                                        TNC16_demo_config["channels"][wasp_mote_ID]["path_established"] = True
+                                        demo_config["channels"][wasp_mote_ID]["path_established"] = True
                                         self.logger.info("E2E path established for ID: %s"%(wasp_mote_ID)) 
 
 
@@ -1170,8 +1180,8 @@ class IoTApp(threading.Thread):
         try:
             #del if any container exists:
             self.logger.info("Deleting containers (if any exists)...")
-            for user in TNC16_demo_config["users"]:
-                service_IP = TNC16_demo_config["users"][user]["service_IP"]   
+            for user in demo_config["users"]:
+                service_IP = demo_config["users"][user]["service_IP"]   
                 res = requests.get("http://"+service_IP+":5000/lxc_del/thingspeak-"+user)   
                 self.logger.info("User: %s | delete status: %s"%(user, res.status_code))
         except: 

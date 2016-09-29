@@ -1,6 +1,6 @@
 #IoT App configuration
 
-TNC16_demo_config = {
+demo_config = {
     "channels":{
         # libelium
         "403472527":{
