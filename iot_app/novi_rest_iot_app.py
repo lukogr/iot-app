@@ -43,7 +43,7 @@ from ryu.lib.packet import ethernet
 from ryu.lib.packet import udp
 
 #app:
-from iot_app_conf import demo_config, channel_type_short
+from iot_app_conf import demo_config, channel_type_short, iot_fwd_port
 import requests, json, re, time, logging.config, threading
 from cherrypy import wsgiserver
 from flask import Flask,jsonify, render_template, request, make_response, current_app, redirect
@@ -979,12 +979,12 @@ class IoTApp(threading.Thread):
                                     try:
                                         
                                         #launch container
-                                        response_run = requests.get("http://"+service_IP+":5000/lxc_run/thingspeak-"+user_name)  
+                                        response_run = requests.get("http://"+service_IP+":"+str(iot_fwd_port)+"/lxc_run/thingspeak-"+user_name)  
                                         self.logger.info("LXC container creation status: %s"%(response_run.json()))
                                         container_ip = None
                                         while container_ip == None:
                                             self.logger.info("Waiting for container IP address...")
-                                            response = requests.get("http://"+service_IP+":5000/lxc_list/thingspeak-"+user_name)  
+                                            response = requests.get("http://"+service_IP+":"+str(iot_fwd_port)+"/lxc_list/thingspeak-"+user_name)  
                                             response_j = response.json()
                                             self.logger.info("%s"%response_j)
                                             if response_j["status"] == "Running":
@@ -993,12 +993,12 @@ class IoTApp(threading.Thread):
                                                 container_ip = response_j["ip"]
 
                                                 #run_script to launch thingspeak
-                                                response_script = requests.get("http://"+service_IP+":5000/lxc_script/thingspeak-"+user_name)  
+                                                response_script = requests.get("http://"+service_IP+":"+str(iot_fwd_port)+"/lxc_script/thingspeak-"+user_name)  
                                                 self.logger.info("response_script: %s"%(response_script))
 
 
                                                 #redirect
-                                                red_res = requests.get("http://"+service_IP+":5000/port_redirect/"+"\""+service_IP+"&"+str(service_port)+"&"+container_ip+"&3000\"")
+                                                red_res = requests.get("http://"+service_IP+":"+str(iot_fwd_port)+"/port_redirect/"+"\""+service_IP+"&"+str(service_port)+"&"+container_ip+"&3000\"")
                                                 self.logger.info("Redirection status: %s"%red_res.json())
 
     
@@ -1076,7 +1076,7 @@ class IoTApp(threading.Thread):
                                         try:        
 
                                             #get from flask service
-                                            response = requests.get("http://"+service_IP+":5000/create_udp_socket/\""+iot_server_IP+"&"+str(iot_server_port)+"\"")  
+                                            response = requests.get("http://"+service_IP+":"+str(iot_fwd_port)+"/create_udp_socket/\""+iot_server_IP+"&"+str(iot_server_port)+"\"")  
                                             r_json = response.json()
                                             self.logger.info("Open UDP socket response: %s"%(r_json["status"]))
                                             if r_json["status"] == "ok":
@@ -1182,7 +1182,7 @@ class IoTApp(threading.Thread):
             self.logger.info("Deleting containers (if any exists)...")
             for user in demo_config["users"]:
                 service_IP = demo_config["users"][user]["service_IP"]   
-                res = requests.get("http://"+service_IP+":5000/lxc_del/thingspeak-"+user)   
+                res = requests.get("http://"+service_IP+":"+str(iot_fwd_port)+"/lxc_del/thingspeak-"+user)   
                 self.logger.info("User: %s | delete status: %s"%(user, res.status_code))
         except: 
             self.logger.error("Problem with deleting old containers. Check if iot_fwd is running!") 

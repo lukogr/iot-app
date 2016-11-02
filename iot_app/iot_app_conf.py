@@ -154,3 +154,4 @@ channel_type_short = {
     "TestChannel":"TC",
     "SpirentChannel":"SP"
 }
+iot_fwd_port = 5001
