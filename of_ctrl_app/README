@@ -1,0 +1,13 @@
+# README #
+
+1) Run cloud orchestrator on the machine witch access to LXC container image with thingspeak service
+# iot_fwd.py
+
+2) Install required Python packages:
+# apt-get install python-pip python-dev
+# pip install ryu repoze.lru stevedore greenlet pyyaml scapy
+
+This code has been tested using Ryu version 3.26, more recent versions of Ryu may not work.
+
+3) In one terminal, start Ryu with novi_rest_iot_app.py application
+$ ryu-manager novi_rest_iot_app.py
